@@ -1,0 +1,4 @@
+service.d/*.sh text eol=lf
+*.py text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
