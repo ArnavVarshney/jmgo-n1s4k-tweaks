@@ -91,9 +91,8 @@ CHECK done — nothing changed.
 
 The stock Settings app forces `zh-rCN` internally, so patching the default
 `values/` resources has no effect — `values-zh-rCN` must be patched.
-The translated APK (~50 MB, re-signed) is intentionally not committed;
-build it from the validated string map in this repo or attach it to a
-GitHub Release.
+The translated APK (~50 MB, re-signed) is built from the validated
+string map, or downloaded from the Releases page.
 
 - Source of truth: [`settings-i18n/overlay_en_strings.xml`](settings-i18n/overlay_en_strings.xml), [`settings-i18n/en_arrays.xml`](settings-i18n/en_arrays.xml)
 - Pipeline: [`docs/SETTINGS_I18N.md`](docs/SETTINGS_I18N.md) (apktool + `zipalign -f -p 4`; full rebuilt APK required)
