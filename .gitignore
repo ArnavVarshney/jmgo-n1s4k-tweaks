@@ -1,0 +1,22 @@
+# Local-only: device backups, toolchains, build outputs, screenshots
+*.img
+*.bin
+*.db
+*.png
+*.log
+jdk/
+jre/
+sdk/
+cmdline-tools/
+build-tools/
+build/
+frida16env/
+setting_dec/
+aurora_dec/
+*.zip
+*.apk
+!apk-source/*.md
+settings_secure.new.xml
+aurora_prefs.xml
+__pycache__/
+*.pyc
