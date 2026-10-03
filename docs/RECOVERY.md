@@ -7,7 +7,7 @@ boot). `/data` may be wiped.
 
 1. Verify jsu setuid present:
    `adb shell ls -l /system/xbin/jsu`
-2. Re-run root: [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root) (`python jmgo_root.py <ip>`)
+2. Re-run root: `python root/jmgo_root.py <ip>` (vendored fixed copy; upstream [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root))
 3. If byte-verify fails — firmware patched the vuln. STOP, do not force.
 4. Re-apply this repo: `python scripts/apply_tweaks.py --device <ip>:5555 --en-apk <path>`
 5. Re-check HOME/roles with screenshot (`scripts/shot.py`).
