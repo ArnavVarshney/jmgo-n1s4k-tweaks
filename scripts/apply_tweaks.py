@@ -60,6 +60,24 @@ DEBLOAT_PATTERNS = [
 ]
 
 
+def expand_component(entry):
+    """Expand Android shorthand 'pkg/.cls' -> 'pkg/pkg.cls' for set compare."""
+    if "/" not in entry:
+        return entry
+    pkg, comp = entry.split("/", 1)
+    if comp.startswith("."):
+        comp = pkg + comp
+    return pkg + "/" + comp
+
+
+def as_service_set(value):
+    return {expand_component(e) for e in value.split(":") if e.strip()}
+
+
+DESIRED_A11Y = as_service_set(A11Y)
+DESIRED_NOTIF = as_service_set(NOTIF)
+
+
 def log(s=""):
     print(s, flush=True)
 
@@ -109,9 +127,24 @@ def step_prereqs(c):
 
 def step_locale(c):
     log("== locale ==")
+    current = {
+        "timezone": c.shell("getprop persist.sys.timezone"),
+        "device_name": c.shell("settings get global device_name"),
+        "private_dns": c.shell("settings get global private_dns_mode"),
+    }
+    log("current: tz=%s name=%s dns=%s" % (
+        current["timezone"], current["device_name"], current["private_dns"]))
+    want_tz = getattr(c, "timezone", "Asia/Hong_Kong")
+    want_name = getattr(c, "device_name", "JMGO N1S 4K")
+    ok = (current["timezone"] == want_tz
+          and current["device_name"] == want_name
+          and current["private_dns"] == "off")
+    if ok:
+        log("locale already correct")
+        return
     cmds = [
-        "setprop persist.sys.timezone Asia/Hong_Kong",
-        "settings put global device_name 'JMGO N1S 4K'",
+        "setprop persist.sys.timezone %s" % want_tz,
+        "settings put global device_name '%s'" % want_name,
         "settings put global private_dns_mode off",
         "settings delete global private_dns_specifier",
     ]
@@ -136,10 +169,15 @@ def step_debloat(c):
     if not targets:
         log("no bloat matches found (already clean?)")
         return
+    disabled_raw = c.shell("pm list packages -d")
+    disabled = {l.split(":", 1)[1].strip() for l in disabled_raw.splitlines()
+                if l.startswith("package:")}
     for pkg in targets:
-        state = c.shell("dumpsys package %s | grep -m1 -i disabled" % pkg)
+        if pkg in disabled:
+            log("already disabled: %s" % pkg)
+            continue
         if c.check:
-            log("[check] would disable: %s (%s)" % (pkg, state[:80]))
+            log("[check] would disable: %s" % pkg)
         else:
             out = c.shell("pm disable-user --user 0 %s" % pkg)
             log("%s -> %s" % (pkg, out[:120]))
@@ -162,6 +200,14 @@ def install_apk(c, path, label):
 
 def step_launcher(c):
     log("== launcher (Projectivy HOME) ==")
+    frozen = c.shell("pm list packages -d")
+    launcher_frozen = "com.jmgo.launcher" in frozen
+    cur = c.shell("dumpsys activity activities | grep -m1 mResumedActivity")
+    log("jmgo launcher frozen: %s" % launcher_frozen)
+    log("resumed: " + cur[:200])
+    if launcher_frozen and PROJ_PKG in cur:
+        log("launcher already correct (Projectivy resumed)")
+        return
     if c.check:
         log("[check] would: freeze com.jmgo.launcher, set-home-activity %s, "
             "fix HOME role" % PROJ_HOME)
@@ -241,6 +287,21 @@ def step_a11y(c):
     xml, _, _ = c.shell_su("cat " + SECURE_XML)
     if "<settings" not in xml:
         log("cannot read " + SECURE_XML); return
+    m1 = re.search(r'name="enabled_accessibility_services" value="([^"]*)"', xml)
+    m2 = re.search(r'name="accessibility_enabled" value="([^"]*)"', xml)
+    m3 = re.search(r'name="enabled_notification_listeners" value="([^"]*)"', xml)
+    cur_a11y = as_service_set(m1.group(1)) if m1 else set()
+    cur_notif = as_service_set(m3.group(1)) if m3 else set()
+    a11y_ok = cur_a11y == DESIRED_A11Y
+    notif_ok = cur_notif == DESIRED_NOTIF
+    enabled_ok = m2 is not None and m2.group(1) == "1"
+    log("a11y services OK: %s (have %d, want %d)" % (a11y_ok, len(cur_a11y), len(DESIRED_A11Y)))
+    if not a11y_ok:
+        log("  have: " + sorted(cur_a11y).__str__()[:300])
+    log("a11y enabled=1: %s / notif OK: %s" % (enabled_ok, notif_ok))
+    if a11y_ok and enabled_ok and notif_ok:
+        log("a11y already correct")
+        return
     xml2, n1 = re.subn(r'(name="enabled_accessibility_services" value=")[^"]*(")',
                        r"\g<1>%s\g<2>" % A11Y, xml)
     if 'name="accessibility_enabled"' in xml2:
@@ -284,6 +345,11 @@ def step_ensettings(c, en_apk):
     here = os.path.dirname(os.path.abspath(__file__))
     svc = os.path.join(here, "..", "service.d", "zz-en-settings.sh")
     svc = os.path.normpath(svc)
+    mounts, _, _ = c.shell_su("mount")
+    bind_active = "JmGOSetting_OS8.0.apk" in mounts
+    log("bind active: %s" % bind_active)
+    svc_present, _, _ = c.shell_su("ls -l /data/adb/service.d/zz-en-settings.sh")
+    log("service.d script: " + svc_present[:160])
     if en_apk:
         if not os.path.exists(en_apk):
             log("EN apk not found: " + en_apk); return
@@ -300,6 +366,10 @@ def step_ensettings(c, en_apk):
         log("on-device EN apk: " + present[:160])
         if "No such file" in present:
             log("supply --en-apk to deploy (see docs/SETTINGS_I18N.md)")
+            return
+        if bind_active and "zz-en-settings.sh" in svc_present:
+            log("ensettings already deployed")
+            return
     if os.path.exists(svc) and en_apk:
         ok, out = c.push(svc, "/data/local/tmp/zz-en-settings.sh")
         log(out[-200:])
@@ -311,9 +381,12 @@ def step_ensettings(c, en_apk):
     elif not os.path.exists(svc):
         log("service script missing in repo: " + svc)
     if c.check:
-        log("[check] would live-bind + force-stop com.jmgo.setting.x")
+        if bind_active:
+            log("[check] bind already active, nothing to do")
+        else:
+            log("[check] would live-bind + force-stop com.jmgo.setting.x")
         return
-    if en_apk:
+    if en_apk and not bind_active:
         out, err, _ = c.shell_su("mount -o bind %s %s && echo BIND_OK" % (EN_TMP, EN_ORIG))
         log((out + err)[-200:])
         log(c.shell("am force-stop com.jmgo.setting.x")[:120])
@@ -333,6 +406,10 @@ def main():
     ap.add_argument("--tvbro-apk", default=None)
     ap.add_argument("--grant-uid", type=int, default=None,
                     help="INSERT OR REPLACE su ALLOW row for uid (prompt UI never appears)")
+    ap.add_argument("--timezone", default="Asia/Hong_Kong",
+                    help="persist.sys.timezone value (default: Asia/Hong_Kong)")
+    ap.add_argument("--device-name", default="JMGO N1S 4K",
+                    help="global device_name (default: 'JMGO N1S 4K')")
     ap.add_argument("--reboot", action="store_true",
                     help="reboot at end if a11y changed")
     args = ap.parse_args()
@@ -340,6 +417,8 @@ def main():
     adb = args.adb or shutil.which("adb") or "adb"
     skip = {s.strip() for s in args.skip.split(",") if s.strip()}
     c = Ctx(adb, args.device, args.check)
+    c.timezone = args.timezone
+    c.device_name = args.device_name
     log("device=%s check=%s skip=%s" % (args.device, args.check, sorted(skip)))
 
     if not step_prereqs(c):

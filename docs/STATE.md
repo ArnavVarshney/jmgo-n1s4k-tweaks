@@ -42,7 +42,9 @@ VLC/YouTube (stock).
 
 ## Settings
 
-- tz `Asia/Hong_Kong`, locale en-US, name `JMGO N1S 4K`, Private DNS OFF.
+- tz `Asia/Hong_Kong`, Private DNS OFF. Device name is user-configurable
+  (`--device-name`, default `JMGO N1S 4K`); reference unit reported
+  `JMGO-N1S 4K高亮版-0120` at check time.
 - a11y: `com.jmgo.hippo/...JmgoKeyAccessibilityService:com.spocky.projengmenu/.services.ProjectivyAccessibilityService`,
   `accessibility_enabled=1`
 - notif listener:
