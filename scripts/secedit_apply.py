@@ -23,6 +23,23 @@ A11Y = ("com.jmgo.hippo/com.jmgo.middleware.service.JmgoKeyAccessibilityService"
 NOTIF = "com.spocky.projengmenu/.services.notification.NotificationListener"
 
 
+def expand_component(entry):
+    if "/" not in entry:
+        return entry
+    pkg, comp = entry.split("/", 1)
+    if comp.startswith("."):
+        comp = pkg + comp
+    return pkg + "/" + comp
+
+
+def as_service_set(value):
+    return {expand_component(e) for e in value.split(":") if e.strip()}
+
+
+DESIRED_A11Y = as_service_set(A11Y)
+DESIRED_NOTIF = as_service_set(NOTIF)
+
+
 def adb_cmd(adb, device, *args):
     return [adb, "-s", device] + list(args)
 
@@ -49,6 +66,19 @@ def main():
         print(r.stdout.decode(errors="replace")[:500])
         print(r.stderr.decode(errors="replace")[:500])
         sys.exit(1)
+
+    m1 = re.search(r'name="enabled_accessibility_services" value="([^"]*)"', xml)
+    m2 = re.search(r'name="accessibility_enabled" value="([^"]*)"', xml)
+    m3 = re.search(r'name="enabled_notification_listeners" value="([^"]*)"', xml)
+    cur_a11y = as_service_set(m1.group(1)) if m1 else set()
+    cur_notif = as_service_set(m3.group(1)) if m3 else set()
+    print("a11y services OK:", cur_a11y == DESIRED_A11Y, sorted(cur_a11y))
+    print("enabled=1:", m2 is not None and m2.group(1) == "1",
+          "| notif OK:", cur_notif == DESIRED_NOTIF)
+    if cur_a11y == DESIRED_A11Y and m2 is not None and m2.group(1) == "1" \
+            and cur_notif == DESIRED_NOTIF:
+        print("already correct, nothing to do")
+        return
 
     xml2, n1 = re.subn(r'(name="enabled_accessibility_services" value=")[^"]*(")',
                        r"\g<1>%s\g<2>" % A11Y, xml)
