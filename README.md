@@ -38,7 +38,7 @@ Every step checks current state first. Re-running is safe.
 1. Python 3.8+ with `PYTHONUTF8=1` (required on Windows for CJK-safe I/O).
 2. Android platform-tools (`adb` on `PATH`).
 3. Projector and computer on the same LAN with ADB reachable.
-4. Working root via `/system/xbin/su` (full path — bare `su` resolves to the Magisk applet and denies without a policy row). If `adb shell /system/xbin/su id` does not return `uid=0`, complete the root step first.
+4. Working root via `/system/xbin/su` (full path — bare `su` resolves to the Magisk applet and denies without a policy row). If `adb shell /system/xbin/su id` does not return `uid=0`, complete the root step first with [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root) (one-click root for the JMGO N1S 4K, `jmgo_root.py`).
 
 ## Quickstart
 
@@ -152,6 +152,13 @@ Issues and PRs are welcome. Please include firmware version
 (`getprop ro.build.version.incremental`), the full `--check` output, and a
 screenshot (`scripts/shot.py`) where UI behavior is involved. Do not commit
 device backups, keystores, APKs, or account tokens.
+
+## Acknowledgments
+
+- Root exploit: [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root) — one-click root for the JMGO N1S 4K. This pack starts where that script ends.
+- Launcher: [Projectivy](https://github.com/spocky/miproja1) (`com.spocky.projengmenu`).
+- Installer: [Aurora Store](https://github.com/whyorean/AuroraStore) (Root installer backend).
+- Root framework: [Magisk](https://github.com/topjohnwu/Magisk) (headless daemon, Zygisk off on this device).
 
 ## License
 
