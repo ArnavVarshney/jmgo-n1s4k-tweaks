@@ -38,7 +38,7 @@ Every step checks current state first. Re-running is safe.
 1. Python 3.8+ with `PYTHONUTF8=1` (required on Windows for CJK-safe I/O).
 2. Android platform-tools (`adb` on `PATH`).
 3. Projector and computer on the same LAN with ADB reachable.
-4. Working root via `/system/xbin/su` (full path — bare `su` resolves to the Magisk applet and denies without a policy row). If `adb shell /system/xbin/su id` does not return `uid=0`, complete the root step first with [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root) (one-click root for the JMGO N1S 4K, `jmgo_root.py`).
+4. Working root via `/system/xbin/su` (full path — bare `su` resolves to the Magisk applet and denies without a policy row). If `adb shell /system/xbin/su id` does not return `uid=0`, run the vendored fixed root script first: `python root/jmgo_root.py <PROJECTOR_IP>` (see [`root/`](root/) — upstream is [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root), whose embedded APK is truncated; this repo vendors the fix).
 
 ## Quickstart
 
@@ -125,6 +125,7 @@ Constraints (verified on-device, see [`docs/PROVEN_BROKEN.md`](docs/PROVEN_BROKE
 
 ```
 README.md
+root/           jmgo_root.py (fixed) + apk-build/execmd.apk + apk-source/ — run first
 docs/           STATE.md PROVEN_BROKEN.md RECOVERY.md FIRMWARE.md SETTINGS_I18N.md
 scripts/        apply_tweaks.py find_projector.py magisk_sql.py secedit_apply.py shot.py
 service.d/      zz-en-settings.sh zz-fix-su.sh
@@ -155,7 +156,7 @@ device backups, keystores, APKs, or account tokens.
 
 ## Acknowledgments
 
-- Root exploit: [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root) — one-click root for the JMGO N1S 4K. This pack starts where that script ends.
+- Root exploit: [Yurishizu9/jmgo-n1s-root](https://github.com/Yurishizu9/jmgo-n1s-root) — one-click root for the JMGO N1S 4K. This repo vendors it under [`root/`](root/) with two fixes (truncated embedded APK → on-disk `apk-build/execmd.apk`; binary-safe `exec-out` block reads).
 - Launcher: [Projectivy](https://github.com/spocky/miproja1) (`com.spocky.projengmenu`).
 - Installer: [Aurora Store](https://github.com/whyorean/AuroraStore) (Root installer backend).
 - Root framework: [Magisk](https://github.com/topjohnwu/Magisk) (headless daemon, Zygisk off on this device).

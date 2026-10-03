@@ -16,6 +16,7 @@ aurora_dec/
 *.zip
 *.apk
 !apk-source/*.md
+!root/apk-build/execmd.apk
 settings_secure.new.xml
 aurora_prefs.xml
 __pycache__/
