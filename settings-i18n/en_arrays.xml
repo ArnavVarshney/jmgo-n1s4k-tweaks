@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="bluetooth_names">
+        <item>JmGO_Bluetooth</item>
+        <item>Outdoor JMGO Projector</item>
+        <item>Living Room JMGO Projector</item>
+        <item>Bedroom JMGO Projector</item>
+        <item>Study JMGO Projector</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="bluetooth_names_vimgo">
+        <item>Bluetooth</item>
+        <item>Outdoor Projector</item>
+        <item>Living Room Projector</item>
+        <item>Bedroom Projector</item>
+        <item>Study Projector</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="special_locale_names">
+        <item>Chinese (Simplified)</item>
+        <item>Chinese (Traditional)</item>
+    </string-array>
+    <string-array name="support_language_int_label_name">
+        <item>Chinese (Simplified)</item>
+        <item>Chinese (Traditional)</item>
+        <item>English</item>
+        <item>Français</item>
+        <item>Deutsch</item>
+        <item>日本語</item>
+        <item>한국어</item>
+        <item>Español</item>
+    </string-array>
+    <string-array name="wifi_status">
+        <item></item>
+        <item>Scanning...</item>
+        <item>Connecting...</item>
+        <item>Authenticating...</item>
+        <item>Obtaining IP address...</item>
+        <item>Connected</item>
+        <item>Suspended</item>
+        <item>Disconnecting...</item>
+        <item>Disconnected</item>
+        <item>Failed</item>
+        <item>Disabled</item>
+        <item>Temporarily disabled (poor network)</item>
+    </string-array>
+</resources>
