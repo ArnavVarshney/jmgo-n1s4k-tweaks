@@ -1,4 +1,4 @@
-# On-device state — 2026-10-02
+# On-device state — 2026-10-02, Plex 2026-10-09
 
 Source: AGENTS.md §3 + live verification notes. Update this file after any
 on-device change (date + what changed).
@@ -39,21 +39,23 @@ Installed: Projectivy 4.71 (default HOME
 grants, a11y + notif listener; onboarding taps pending user), Aurora
 (Root installer id=2, silent installs), TV Bro, ExecCmd (keep),
 VLC/YouTube (stock).
+- Plex 2026.19.1 **patched build** (2026-10-09, see `docs/PLEX.md`):
+  Vizbee init no-op'd, re-signed local key, Aurora-blacklisted.
 
 ## Settings
 
 - tz `Asia/Hong_Kong`, name `JMGO N1S 4K` (renamed 2026-10-03;
   firmware default was `JMGO-N1S 4K高亮版-0120`), Private DNS OFF.
   Name is user-configurable via `--device-name`.
+- Plex patched build deployed — sign in as user.
 - a11y: `com.jmgo.hippo/...JmgoKeyAccessibilityService:com.spocky.projengmenu/.services.ProjectivyAccessibilityService`,
   `accessibility_enabled=1`
 - notif listener:
   `com.spocky.projengmenu/.services.notification.NotificationListener`
-- Plex never installed — via Aurora by user.
 
 ## Open threads
 
-1. User: Projectivy onboarding taps; Plex install via Aurora.
+1. User: Projectivy onboarding taps; Plex sign-in.
 2. Optional: SmartTube if asked.
 3. Leftover Chinese outside settings = other packages, per-screen rebuilds.
 4. Keep declining OTAs.
