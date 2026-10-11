@@ -110,6 +110,7 @@ Constraints (verified on-device, see [`docs/PROVEN_BROKEN.md`](docs/PROVEN_BROKE
 | `scripts/find_projector.py` | Sweep a `/24` for port `5555` (64 threads) |
 | `scripts/magisk_sql.py` | Query Magisk's DB, e.g. `--device <ip>:5555 "SELECT * FROM policies;"` |
 | `scripts/secedit_apply.py` | Accessibility / notification-listener fix without the full pack (`--check`, `--reboot`) |
+| `scripts/heal_a11y.py` | Rebind orphaned Projectivy accessibility service via same-version reinstall (`--check`); heals the "enabled but not running" state without reboot |
 | `scripts/shot.py` | Binary-safe `screencap` via `exec-out` (`adb shell` corrupts `0A→0D0A`; JMGO prepends a wrapper line that is stripped) |
 
 ## Known limitations

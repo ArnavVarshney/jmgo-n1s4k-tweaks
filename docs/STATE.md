@@ -53,12 +53,19 @@ VLC/YouTube (stock).
 - notif listener:
   `com.spocky.projengmenu/.services.notification.NotificationListener`
 - 2026-10-11: Projectivy service showed enabled-but-not-running with a
-  persistent enable prompt. Cause: system kept it in the accessibility
-  "crashed services" list (killed while bound, most likely by Aurora's
-  silent 4.71→4.72 update) and never rebound it. Fixed by reboot
-  (both services bound, crashed list empty). Prevention: Projectivy is
-  blacklisted from Aurora silent updates (`ignored_update`, same as Plex)
-  — update it manually, then reboot.
+  persistent enable prompt. Cause: system keeps a killed-while-bound
+  service in the accessibility "crashed services" list and never rebinds
+  it (triggered by Aurora's silent 4.71→4.72 update, then again by a
+  deep mem-sleep suspend). Heal WITHOUT reboot: reinstall the same APKs
+  (`scripts/heal_a11y.py` — package-update path rebuilds service state
+  fresh, no data loss). Does NOT heal via: `settings put` (silently
+  ignored from shell/root/system uids), `pm disable/enable` (works but
+  flag persists), force-stop/relaunch. Note this box has NO accessibility
+  settings screen at all (JMGO stripped it; stock toggle intent resolves
+  to nothing), so the prompt notification leads nowhere. Prevention:
+  Projectivy is blacklisted from Aurora silent updates
+  (`ignored_update`, same as Plex) — update manually, then run the heal
+  script; avoid mem-sleep unless followed by a heal.
 
 ## Open threads
 
