@@ -52,6 +52,13 @@ VLC/YouTube (stock).
   `accessibility_enabled=1`
 - notif listener:
   `com.spocky.projengmenu/.services.notification.NotificationListener`
+- 2026-10-11: Projectivy service showed enabled-but-not-running with a
+  persistent enable prompt. Cause: system kept it in the accessibility
+  "crashed services" list (killed while bound, most likely by Aurora's
+  silent 4.71→4.72 update) and never rebound it. Fixed by reboot
+  (both services bound, crashed list empty). Prevention: Projectivy is
+  blacklisted from Aurora silent updates (`ignored_update`, same as Plex)
+  — update it manually, then reboot.
 
 ## Open threads
 
